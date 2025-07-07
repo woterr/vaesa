@@ -8,6 +8,3 @@ TODO
   RSA for session keys, and message encryption using AES
 - Better interface:
   Fix bugged out interface
-- Logs:
-  Log connections, messages, errors
-  
