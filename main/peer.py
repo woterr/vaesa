@@ -6,7 +6,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.logs_config import comms_logger, net_logger, error_logger
 from utils.ports import get_ports
 
-stop_input = threading.Event()
 class Peer:
     # initialise port and host, and socket
     def __init__(self, host, port):
@@ -31,7 +30,6 @@ class Peer:
             self.connections.append(conn)
             print(f"[ SYSTEM ] Connected to: {addr}")
             net_logger.info(f'{self.host}:{self.port} accepted connection from {addr}')
-            stop_input.set()
             threading.Thread(target=self.receive_data, args=(conn,), daemon=True).start()
 
     # send requestion to other ports
@@ -51,15 +49,16 @@ class Peer:
         while True:
             try:
                 # wait for bytes
+                sender = self.addr_map.get(conn, ('Unknown', 0))
                 data = conn.recv(1024)
                 if not data:
-                    print("[ SYSTEM ] Connection closed by PEER")
+                    print(f"[ SYSTEM ] Connection closed by PEER {sender[0]}:{sender[1]}")
                     net_logger.info(f'{self.host}:{self.port} Closed connection')
                     break
 
-                print(f"\n[ RECEIVED ]: {data.decode()}")
+                print(f"\n[ RECEIVED from {sender[0]}:{sender[1]} ]: {data.decode()}")
                 comms_logger.info(f'{self.host}:{self.port} received: {data.decode()}') 
-                print(" [ MESSAGE (YOU) ]: ", end='', flush=True)
+                print("[ MESSAGE (YOU) ]: ", end='', flush=True)
  
             # incase connection dies out
             except ConnectionResetError:
