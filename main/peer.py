@@ -1,51 +1,66 @@
 import socket
 import threading
-from logs_config import comms_logger, net_logger, error_logger
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from utils.logs_config import comms_logger, net_logger, error_logger
+from utils.ports import get_ports
 
 class Peer:
+    # initialise port and host, and socket
     def __init__(self, host, port):
         self.host = host
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # make it possible to have more than a single connection
         self.connections = []
 
+    # start listening on a port
     def start_peer(self):
         self.socket.bind((self.host, self.port))
         self.socket.listen(1)
-        print(f'[ PEER ] Lisitening on PORT {self.port}')
+        print(f'[ SYSTEM ] Lisitening on PORT {self.port}')
         net_logger.info(f'A PEER is listening on PORT {self.port}')
         threading.Thread(target=self.accept_req, daemon=True).start()
         
-
+    # accept connections from other ports
     def accept_req(self):
         while True:
             conn, addr = self.socket.accept()
             self.connections.append(conn)
-            print(f"[ CONNECTED ] {addr}")
+            print(f"[ SYSTEM ] Connected to: {addr}")
             net_logger.info(f'{self.host}:{self.port} accepted connection from {addr}')
             threading.Thread(target=self.receive_data, args=(conn,), daemon=True).start()
 
+    # send requestion to other ports
     def connect_req(self, peer_host, peer_port):
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         conn.connect((peer_host, peer_port))
+
+        # add connection to array of connections
         self.connections.append(conn)
+
         print(f"[ PEER ] Connected to {peer_host}:{peer_port}")
         net_logger.info(f'{self.host}:{self.port} connected to {peer_host}:{peer_port}')
         threading.Thread(target=self.receive_data, args=(conn,), daemon=True).start()
 
+    # get data from other ports after connection
     def receive_data(self, conn):
         while True:
             try:
+                # wait for bytes
                 data = conn.recv(1024)
                 if not data:
-                    print("[ INFO ] Connection closed by peer.", flush=True)
+                    print("[ SYSTEM ] Connection closed by PEER")
                     net_logger.info(f'{self.host}:{self.port} Closed connection')
                     break
-                print(f"[ RECEIVED ]: {data.decode()}", flush=True)
-                comms_logger.info(f'{self.host}:{self.port} Recieved: {data.decode()}')
 
+                print(f"[ RECEIVED ]: {data.decode()}")
+                comms_logger.info(f'{self.host}:{self.port} received: {data.decode()}') 
+ 
+            # incase connection dies out
             except ConnectionResetError:
-                print("[ ERROR ] Connection reset by peer.")
+                print("[ ERROR ] Connection reset by PEER")
                 net_logger.info(f'{self.host}:{self.port} Reset connection')
                 break
             except Exception as e:
@@ -54,9 +69,10 @@ class Peer:
                 break
 
     def send_data(self, message):
+        # send data to all connections
         for conn in self.connections:
             try:
-                conn.sendall(message.encode())
+                conn.sendall(message.encode()) # data transfer must happen through raw bites
                 comms_logger.info(f'{self.host}:{self.port} Sent: {message}')
             except:
                 continue
@@ -64,17 +80,31 @@ class Peer:
 
 if __name__ == "__main__":
     import time
-    HOST = 'localhost'
-    PORT = int(input("[ SYSTEM ]: Enter SENDER PORT:"))
 
-    peer = Peer(HOST, PORT)
+    with open("CREDENTIALS.txt", "r") as f:
+        CREDS = f.read().split()
+        try:
+            HOST, PORT = CREDS[0], int(CREDS[1])
+        except IndexError:
+                HOST = input("[ SYSTEM ]: Enter SYSTEM IP: ")
+                PORT = int(input("[ SYSTEM ]: Enter SENDER PORT: "))
+
+
+    peer = Peer(HOST, PORT) # create object
     peer.start_peer()
 
     conn_bool = input("Connect to another peer? y/n: ")
-    conn_param = ["y", "1", ""]
-    if conn_bool in conn_param:
+    accepting_param = ["y", "1", "", "yes"]
+
+    # FIX THIS TO MAKE THE UI EXPERIENCE BETTER
+    if conn_bool in accepting_param:
+        ports = get_ports()
         initiator_bool = input("Are you the initiator? (Yes if initiator, else wait for connection): ")
-        if initiator_bool in conn_param:
+        if initiator_bool in accepting_param:
+            print("Available ports: ")
+            for port in ports:
+                if port != PORT:
+                    print(port)
             recv_port = int(input("Enter RECIEVER PORT: "))
             peer.connect_req(peer_host=HOST, peer_port=recv_port)
 

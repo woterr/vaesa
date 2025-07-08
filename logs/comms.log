@@ -1,6 +1,4 @@
-2025-07-07 18:33:13,939 - localhost:3001 Sent: hi
-2025-07-07 18:33:13,939 - localhost:3002 Recieved: hi
-2025-07-07 18:33:26,590 - localhost:3002 Sent: hallo
-2025-07-07 18:33:26,590 - localhost:3001 Recieved: hallo
-2025-07-07 18:33:30,858 - localhost:3001 Sent: hiiiiiiii
-2025-07-07 18:33:30,858 - localhost:3002 Recieved: hiiiiiiii
+2025-07-08 10:50:02,844 - localhost:3012 Sent: hi
+2025-07-08 10:50:02,844 - localhost:3011 received: hi
+2025-07-08 10:50:06,427 - localhost:3011 Sent: wsg
+2025-07-08 10:50:06,427 - localhost:3012 received: wsg

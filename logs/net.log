@@ -1,5 +1,8 @@
-2025-07-07 18:32:51,643 - A PEER is listening on PORT 3001
-2025-07-07 18:32:59,146 - A PEER is listening on PORT 3002
-2025-07-07 18:33:08,725 - localhost:3001 connected to localhost:3002
-2025-07-07 18:33:08,725 - localhost:3002 accepted connection from ('127.0.0.1', 58244)
-2025-07-07 18:34:25,019 - localhost:3002 Closed connection
+2025-07-08 10:42:50,994 - A PEER is listening on PORT 3011
+2025-07-08 10:43:10,746 - A PEER is listening on PORT 3012
+2025-07-08 10:49:37,587 - A PEER is listening on PORT 3012
+2025-07-08 10:49:44,053 - A PEER is listening on PORT 3011
+2025-07-08 10:50:01,344 - localhost:3012 connected to localhost:3011
+2025-07-08 10:50:01,345 - localhost:3011 accepted connection from ('127.0.0.1', 50922)
+2025-07-08 11:12:24,852 - localhost:3012 Closed connection
+2025-07-08 11:21:08,352 - A PEER is listening on PORT 3001
