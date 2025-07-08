@@ -14,6 +14,7 @@ class Peer:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # make it possible to have more than a single connection
         self.connections = []
+        self.addr_map = {}
 
     # start listening on a port
     def start_peer(self):
@@ -28,6 +29,7 @@ class Peer:
         while True:
             conn, addr = self.socket.accept()
             self.connections.append(conn)
+            self.addr_map[conn] = addr
             print(f"[ SYSTEM ] Connected to: {addr}")
             net_logger.info(f'{self.host}:{self.port} accepted connection from {addr}')
             threading.Thread(target=self.receive_data, args=(conn,), daemon=True).start()
