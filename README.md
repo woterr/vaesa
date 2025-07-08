@@ -19,7 +19,7 @@ This project is a secure peer-to-peer communication system over a custom network
 
 A Peer-to-Peer process deals with a netwrok structure where both the nodes act as both - a client, and a server. In contrast to P2P networks, a Server-Client network ensures that each node is acting as a client except a single node that acts as a server. This server node accepts incoming requests and returns data. It could return the data to the same client, or any other client connected to the network. 
 
-For example, assume you are talking to your friend in private. This is a P2P network. But assume you have a group leader who is conveying messages from one person to another, that is a client-server network. 
+Assume you're talking to a friend in secret. This is a Peer-to-Peer network. But suppose you have a group leader who sends messages from one person to another; this is a client-server network. 
 
 ## Project architecture
 
@@ -29,7 +29,7 @@ This implementation leverages Python’s built-in socket module to manage TCP co
 
 ### Threading
 
-Threading allows multiple connections to a single PEER. Each connection can have its own thread, allowing it to receive data independently without blocking others. Without threading, the server would freeze while waiting for one peer to send data. This is mostly useful when a single PEER is broadcasting data to multiple PEERS (1,2,3)whereas the other PEERS have one-on-one communication with the main PEER.
+Threading allows multiple connections to a single PEER. Each connection can have its own thread, allowing it to receive data independently without blocking others. Without threading, the server would freeze while waiting for one peer to send data. This is mostly useful when a single PEER is broadcasting data to multiple PEERS (1,2,3) whereas the other PEERS have one-on-one communication with the main PEER.
 
 ### Data Transmission
 
