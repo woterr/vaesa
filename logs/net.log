@@ -6,3 +6,8 @@
 2025-07-08 10:50:01,345 - localhost:3011 accepted connection from ('127.0.0.1', 50922)
 2025-07-08 11:12:24,852 - localhost:3012 Closed connection
 2025-07-08 11:21:08,352 - A PEER is listening on PORT 3001
+2025-07-08 11:30:49,393 - A PEER is listening on PORT 3001
+2025-07-08 11:31:17,836 - 172.27.184.1:3001 connected to 192.168.29.128:3001
+2025-07-08 11:31:35,000 - 172.27.184.1:3001 Closed connection
+2025-07-08 13:27:02,620 - A PEER is listening on PORT 3001
+2025-07-08 13:27:31,166 - 172.27.184.1:3001 connected to 192.168.29.128:3001

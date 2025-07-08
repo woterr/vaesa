@@ -57,6 +57,7 @@ class Peer:
 
                 print(f"[ RECEIVED ]: {data.decode()}")
                 comms_logger.info(f'{self.host}:{self.port} received: {data.decode()}') 
+                print(" [ MESSAGE (YOU) ]: ", end='', flush=True)
  
             # incase connection dies out
             except ConnectionResetError:
@@ -86,8 +87,10 @@ if __name__ == "__main__":
         try:
             HOST, PORT = CREDS[0], int(CREDS[1])
         except IndexError:
-                HOST = input("[ SYSTEM ]: Enter SYSTEM IP: ")
-                PORT = int(input("[ SYSTEM ]: Enter SENDER PORT: "))
+            HOST = input("[ SYSTEM ]: Enter SENDER IP: ")
+            PORT = int(input("[ SYSTEM ]: Enter SENDER PORT: "))
+        except OSError:
+            PORT = int(input("[ SYSTEM ]: Enter SENDER PORT: "))
 
 
     peer = Peer(HOST, PORT) # create object
@@ -98,15 +101,11 @@ if __name__ == "__main__":
 
     # FIX THIS TO MAKE THE UI EXPERIENCE BETTER
     if conn_bool in accepting_param:
-        ports = get_ports()
         initiator_bool = input("Are you the initiator? (Yes if initiator, else wait for connection): ")
         if initiator_bool in accepting_param:
-            print("Available ports: ")
-            for port in ports:
-                if port != PORT:
-                    print(port)
+            recv_host = (input("Enter RECIEVER IP: "))
             recv_port = int(input("Enter RECIEVER PORT: "))
-            peer.connect_req(peer_host=HOST, peer_port=recv_port)
+            peer.connect_req(peer_host=recv_host, peer_port=recv_port)
 
         while True:
             msg = input("\n[ MESSAGE (YOU) ]: ")
