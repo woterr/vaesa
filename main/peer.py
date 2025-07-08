@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.logs_config import comms_logger, net_logger, error_logger
 from utils.ports import get_ports
 
+stop_input = threading.Event()
 class Peer:
     # initialise port and host, and socket
     def __init__(self, host, port):
@@ -30,6 +31,7 @@ class Peer:
             self.connections.append(conn)
             print(f"[ SYSTEM ] Connected to: {addr}")
             net_logger.info(f'{self.host}:{self.port} accepted connection from {addr}')
+            stop_input.set()
             threading.Thread(target=self.receive_data, args=(conn,), daemon=True).start()
 
     # send requestion to other ports
