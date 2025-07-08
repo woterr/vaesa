@@ -81,16 +81,20 @@ class Peer:
 
 if __name__ == "__main__":
     import time
-
+    ports = get_ports()
     with open("CREDENTIALS.txt", "r") as f:
         CREDS = f.read().split()
         try:
             HOST, PORT = CREDS[0], int(CREDS[1])
+            for i in ports:
+                if i == PORT:
+                    PORT = int(input("[ SYSTEM ]: This PORT is already being used. Enter SENDER PORT: "))
         except IndexError:
             HOST = input("[ SYSTEM ]: Enter SENDER IP: ")
             PORT = int(input("[ SYSTEM ]: Enter SENDER PORT: "))
-        except OSError:
-            PORT = int(input("[ SYSTEM ]: Enter SENDER PORT: "))
+            for i in ports:
+                if i == PORT:
+                    PORT = int(input("[ SYSTEM ]: This PORT is already being used. Enter SENDER PORT: "))
 
 
     peer = Peer(HOST, PORT) # create object
@@ -102,7 +106,11 @@ if __name__ == "__main__":
     # FIX THIS TO MAKE THE UI EXPERIENCE BETTER
     if conn_bool in accepting_param:
         initiator_bool = input("Are you the initiator? (Yes if initiator, else wait for connection): ")
+
         if initiator_bool in accepting_param:
+            for i in ports:
+                if i != PORT:
+                    print(f'RECIEVER PORT on this host: {i}')
             recv_host = (input("Enter RECIEVER IP: "))
             recv_port = int(input("Enter RECIEVER PORT: "))
             peer.connect_req(peer_host=recv_host, peer_port=recv_port)
