@@ -53,11 +53,11 @@ class Peer:
                 data = conn.recv(1024)
                 if not data:
                     print(f"[ SYSTEM ] Connection closed by PEER {sender[0]}:{sender[1]}")
-                    net_logger.info(f'{self.host}:{self.port} Closed connection')
+                    net_logger.info(f'{self.host}:{self.port} Closed connection with {sender[0]}:{sender[1]}')
                     break
 
                 print(f"\n[ RECEIVED from {sender[0]}:{sender[1]} ]: {data.decode()}")
-                comms_logger.info(f'{self.host}:{self.port} received: {data.decode()}') 
+                comms_logger.info(f'{self.host}:{self.port} received: {data.decode()} from {sender[0]}:{sender[1]}') 
                 print("[ MESSAGE (YOU) ]: ", end='', flush=True)
  
             # incase connection dies out
