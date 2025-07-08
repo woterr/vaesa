@@ -55,7 +55,7 @@ class Peer:
                     net_logger.info(f'{self.host}:{self.port} Closed connection')
                     break
 
-                print(f"[ RECEIVED ]: {data.decode()}")
+                print(f"\n[ RECEIVED ]: {data.decode()}")
                 comms_logger.info(f'{self.host}:{self.port} received: {data.decode()}') 
                 print(" [ MESSAGE (YOU) ]: ", end='', flush=True)
  
