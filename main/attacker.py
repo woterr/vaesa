@@ -4,4 +4,4 @@ def packet_callback(packet):
     if packet.haslayer(Raw):
         print("[INTERCEPTED] Raw Data:", packet[Raw].load)
 
-sniff(iface="eth0", filter="tcp port 3001 3002 3003", prn=packet_callback, store=0)
+sniff(iface="enp0s3", filter="tcp port 3001 3002 3003", prn=packet_callback, store=0)
