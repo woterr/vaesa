@@ -5,6 +5,7 @@ TODO
 - Demo:
   Spoof, ECB Attacks, Padding Oracle attack
 - Better UI
+- Fix session keys for multiple connections (store in dictionary with port/unique identifier)
 
 # Infrastructure
 
