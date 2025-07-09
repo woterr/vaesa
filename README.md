@@ -4,10 +4,7 @@ TODO
   MITM, Spoofing
 - Demo:
   Spoof, ECB Attacks, Padding Oracle attack
-- Encryption:
-  RSA for session keys, and message encryption using AES
-
-
+- Better UI
 
 # Infrastructure
 
@@ -31,9 +28,13 @@ This implementation leverages Python’s built-in socket module to manage TCP co
 
 Threading allows multiple connections to a single PEER. Each connection can have its own thread, allowing it to receive data independently without blocking others. Without threading, the server would freeze while waiting for one peer to send data. This is mostly useful when a single PEER is broadcasting data to multiple PEERS (1,2,3) whereas the other PEERS have one-on-one communication with the main PEER.
 
+![Multiple Connections](https://github.com/user-attachments/assets/e74c58e5-0c0e-4d07-8598-235b1bb2215c)
+
 ### Data Transmission
 
 Data transmission between nodes is always done in bytes. Since the system uses TCP/IP to transfer data, we are reducing it to bytes before lending it off to the protocol. This is because the socket layer in Python (and in general networking) operates at the byte level. Strings and structured data must be encoded into bytes before being sent and decoded after being received. This design choice ensures compatibility with cryptographic operations and future support for more complex data types like files or JSON. 
+
+![Multiple Connections](https://github.com/user-attachments/assets/6e5d5356-6454-4af5-b22d-4b764667ec39)
 
 ### Logs
 
@@ -41,3 +42,24 @@ All data, activities, and errors within the system must be logged for future ref
 
 # Encryption and Security
 
+All messages sent between peers are encrypted (and logged). The encryption workflow is described in the diagram:
+
+![Encryption Flow](https://github.com/user-attachments/assets/9e480029-87c3-40d1-a08a-477bcf33655e)
+
+This structure solves a good number of problems - as listed below:
+
+- **Confidentiality**
+	- Q: How do we ensure that only the intended recipient can read the message?
+	- A: AES encrypts messages using a session key. Only the recipient who holds the correct session key (exchanged securely using RSA) can decrypt the message. **Eavesdroppers can't read the data**, even if they intercept it.
+- **Key Distribution**
+	- Q: How do we safely share encryption keys between two peers over an insecure channel?
+	- A: The sender encrypts the AES session key with the receiver's public RSA key. Only the receiver can decrypt it using their private RSA key.
+- **Forward Secrecy**
+	- Q: What happens if a session key is compromised? Will past communication be exposed?
+	- By generating a new session key for each connection, past messages remain secure if a key is leaked later. Compromise of one key ≠ compromise of all history.
+- **Integrity and Tamper Protection**
+	- Q: How do we know if someone tampered with the message in transit?
+	- A: AES in CBC mode prevents meaningful tampering.
+- **Scalability for Multi-Peer Networks**
+	- Q: Scalability for Multi-Peer Networks
+	- A: Each peer has its own session key per connection.
