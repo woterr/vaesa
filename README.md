@@ -5,6 +5,7 @@ TODO
 - Demo:
   Spoof, ECB Attacks, Padding Oracle attack
 - Better UI
+- Fix session keys for multiple connections (store in dictionary with port/unique identifier)
 
 # Infrastructure
 
@@ -34,7 +35,7 @@ Threading allows multiple connections to a single PEER. Each connection can have
 
 Data transmission between nodes is always done in bytes. Since the system uses TCP/IP to transfer data, we are reducing it to bytes before lending it off to the protocol. This is because the socket layer in Python (and in general networking) operates at the byte level. Strings and structured data must be encoded into bytes before being sent and decoded after being received. This design choice ensures compatibility with cryptographic operations and future support for more complex data types like files or JSON. 
 
-![Multiple Connections](https://github.com/user-attachments/assets/6e5d5356-6454-4af5-b22d-4b764667ec39)
+![Message flow](https://github.com/user-attachments/assets/e4c8732d-8fde-42e5-a24c-e5bf5bed98c7)
 
 ### Logs
 
