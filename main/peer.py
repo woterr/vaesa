@@ -5,7 +5,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.logs_config import comms_logger, net_logger, error_logger
 from utils.ports import get_ports
-from encryption.session_keys import decypt_sk, gen_sk, encrypt_sk
+from utils.session_id_util import send_session_handshake, recv_session_handshake
+from encryption.session_keys import decrypt_sk, gen_sk, encrypt_sk, gen_session_id
 from encryption.rsa_keypair import public_bytes, private_bytes
 from encryption.aes_encrypt import encrypt_data, decrypt_data
 
@@ -19,7 +20,8 @@ class Peer:
         self.connections = []
         self.addr_map = {}
         # security
-        self.session_key = None
+        self.session_keys = {}
+        self.session_id_map = {}
 
     # start listening on a port
     def start_peer(self):
@@ -44,19 +46,27 @@ class Peer:
             print(f"[ SYSTEM ] Recieved public key from {addr}")
             net_logger.info(f'{self.host}:{self.port} Recieved public key from {addr}')
 
+            # make session id
+            session_id = gen_session_id()
+            print(f"[ SYSTEM ] Session ID: {session_id}")
+            net_logger.info(f'{self.host}:{self.port} Created a session ID with {addr}: {session_id}')
+            self.session_id_map[conn] = session_id
+
             # generate session key and encrypt with the public key u got
-            
-            self.session_key = gen_sk()
+            self.session_keys[session_id] = gen_sk()
             print(f"[ SYSTEM ] Generated session key for {addr}")
-            encrypted_sk = encrypt_sk(self.session_key, public_bytes)
+            encrypted_sk = encrypt_sk(self.session_keys[session_id], public_bytes)
             print(f"[ SYSTEM ] Encrypted session key for {addr}")
 
-            # send the encrypted session key back to the peer
-            conn.sendall(len(encrypted_sk).to_bytes(2, 'big') + encrypted_sk)
+            send_session_handshake(conn, session_id, encrypted_sk)
+
             print(f"[ SYSTEM ] Sent encrypted session key to {addr}")
             net_logger.info(f'{self.host}:{self.port} Sent encrypted session key to {addr}')
 
-            threading.Thread(target=self.receive_data, args=(conn,), daemon=True).start()
+
+            threading.Thread(target=self.receive_data, args=(conn,), daemon=True).start()   
+            
+            
 
     # send requestion to other ports
     def connect_req(self, peer_host, peer_port):
@@ -75,14 +85,18 @@ class Peer:
         print(f"[ PEER ] Sent public key to {peer_host}:{peer_port}")
         net_logger.info(f'{self.host}:{self.port} sent its public key to {peer_host}:{peer_port}')
 
-
         # get the encrypted session key (encrypted using public key) to decrypt using my private key
-        length = int.from_bytes(conn.recv(2), 'big')
-        encrypted_sk = conn.recv(length)
+        session_id, encrypted_sk = recv_session_handshake(conn)
 
-        self.session_key = decypt_sk(encrypted_sk, private_bytes)
+        print(f"[ SYSTEM ] Received session ID: {session_id}")
+        self.session_id_map[conn] = session_id
+
+        # session key
+        self.session_keys[session_id] = decrypt_sk(encrypted_sk, private_bytes)
         print(f"[ PEER ] Recieved session key from {peer_host}:{peer_port}")
-        net_logger.info(f'{self.host}:{self.port} recieved session key from {peer_host}:{peer_port} - {self.session_key.hex()}')
+        net_logger.info(f'{self.host}:{self.port} recieved session key from {peer_host}:{peer_port} - {self.session_keys[session_id].hex()}')
+
+
         threading.Thread(target=self.receive_data, args=(conn,), daemon=True).start()
 
 
@@ -92,13 +106,22 @@ class Peer:
             try:
                 # wait for bytes
                 sender = self.addr_map.get(conn, ('Unknown', 0))
-                received_data = conn.recv(4096).decode()
+                raw = conn.recv(4096)
+
+                if not raw:
+                    print(f"[ SYSTEM ] Connection closed by PEER {sender[0]}:{sender[1]}")
+                    net_logger.info(f'{self.host}:{self.port} Closed connection with {sender[0]}:{sender[1]}')
+                    break
+
+                received_data = raw.decode()
+
                 fields = dict(field.split("::") for field in received_data.split("||"))
                 iv = bytes.fromhex(fields['iv'])
                 sender_port = fields['port']
                 encrytped_data = bytes.fromhex(fields['data'])
+                session_id = self.session_id_map[conn]
 
-                data = decrypt_data(self.session_key, iv, encrytped_data)
+                data = decrypt_data(self.session_keys[session_id], iv, encrytped_data)
 
                 if not data:
                     print(f"[ SYSTEM ] Connection closed by PEER {sender[0]}:{sender[1]}")
@@ -123,15 +146,17 @@ class Peer:
         # send data to all connections
         for conn in self.connections:
             try:
-                if self.session_key:
+                session_id = self.session_id_map[conn]
+                if self.session_keys[session_id]:
 
-                    iv, cipher = encrypt_data(self.session_key, message.encode())
+                    iv, cipher = encrypt_data(self.session_keys[session_id], message.encode())
                     msg = f"iv::{iv.hex()}||data::{cipher.hex()}||port::{self.port}".encode()
                     conn.sendall(msg)
 
                     comms_logger.info(f'{self.host}:{self.port} Sent: {cipher.hex()}')
                 else:
-                    print("Session key does not exist.")
+                    sender = self.addr_map.get(conn, ('Unknown', 0))
+                    print(f"Session key for {sender} does not exist.")
             except Exception as e:
                 error_logger.error(f"{self.host}:{self.port} Failed to send message: {e}")
                 continue
@@ -169,7 +194,7 @@ if __name__ == "__main__":
             except (KeyboardInterrupt, EOFError):
                 break
 
-    # FIX THIS TO MAKE THE UI EXPERIENCE BETTER
+    # FIX THIS TO MAKE THE UX BETTER
     if conn_bool:
         initiator_bool = input("Are you the initiator? (Yes if initiator, else wait for connection): ").strip().lower() in accepting_param
 
