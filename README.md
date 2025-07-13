@@ -22,7 +22,7 @@ Assume you're talking to a friend in secret. This is a Peer-to-Peer network. But
 
 A PEER refers to a node in a Peer-to-Peer (P2P) communication system. Each peer can act both as a client and a server. When the system starts, it launches a server that listens on a specified port for incoming connections. Other peers in the network can establish connections to this port to initiate communication. Once connected, peers can both send and receive messages using the same socket interface. 
 
-This implementation leverages Python’s built-in socket module to manage TCP connections. Each peer maintains a list of active connections and handles incoming data in real-time using multithreading to allow concurrent message exchange. All messages sent across the network pass through encrypted channels (AES-CBC), ensuring confidentiality.
+This implementation leverages Python’s built-in socket module to manage TCP connections. Each peer maintains a list of active connections and handles incoming data in real-time using multithreading to allow concurrent message exchange. These connections are uniquely identified using session IDs. All messages sent across the network pass through encrypted channels (AES-CBC), ensuring confidentiality.
 
 ### Threading
 
@@ -50,7 +50,7 @@ This structure solves a good number of problems - as listed below:
 
 - **Confidentiality**
 	- Q: How do we ensure that only the intended recipient can read the message?
-	- A: AES encrypts messages using a session key. Only the recipient who holds the correct session key (exchanged securely using RSA) can decrypt the message. **Eavesdroppers can't read the data**, even if they intercept it.
+	- A: AES encrypts messages using a session key. These session keys have a unique session ID which allows multiple connections between different PEERS. Also, only the recipient who holds the correct session key (exchanged securely using RSA) can decrypt the message. **Eavesdroppers can't read the data**, even if they intercept it.
 - **Key Distribution**
 	- Q: How do we safely share encryption keys between two peers over an insecure channel?
 	- A: The sender encrypts the AES session key with the receiver's public RSA key. Only the receiver can decrypt it using their private RSA key.
