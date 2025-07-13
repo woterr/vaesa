@@ -1,4 +1,4 @@
-main/CREDENTIALS.txt
+CREDENTIALS.txt
 logs/
-main/private_key.pem
-main/public_key.pem
+private_key.pem
+public_key.pem
