@@ -95,6 +95,7 @@ class Peer:
                 received_data = conn.recv(4096).decode()
                 fields = dict(field.split("::") for field in received_data.split("||"))
                 iv = bytes.fromhex(fields['iv'])
+                sender_port = fields['port']
                 encrytped_data = bytes.fromhex(fields['data'])
 
                 data = decrypt_data(self.session_key, iv, encrytped_data)
@@ -103,9 +104,9 @@ class Peer:
                     print(f"[ SYSTEM ] Connection closed by PEER {sender[0]}:{sender[1]}")
                     net_logger.info(f'{self.host}:{self.port} Closed connection with {sender[0]}:{sender[1]}')
                     break
-
-                print(f"\n[ RECEIVED from {sender[0]}:{sender[1]} ]: {data}")
-                comms_logger.info(f'{self.host}:{self.port} received: {encrytped_data.hex()} from {sender[0]}:{sender[1]}') 
+                
+                print(f"\n[ RECEIVED from {sender[0]}:{sender_port} ]: {data}")
+                comms_logger.info(f'{self.host}:{self.port} received: {encrytped_data.hex()} from {sender[0]}:{sender_port}') 
                 print("[ MESSAGE (YOU) ]: ", end='', flush=True)
  
             # incase connection dies out
@@ -125,7 +126,7 @@ class Peer:
                 if self.session_key:
 
                     iv, cipher = encrypt_data(self.session_key, message.encode())
-                    msg = f"iv::{iv.hex()}||data::{cipher.hex()}".encode()
+                    msg = f"iv::{iv.hex()}||data::{cipher.hex()}||port::{self.port}".encode()
                     conn.sendall(msg)
 
                     comms_logger.info(f'{self.host}:{self.port} Sent: {cipher.hex()}')
@@ -134,7 +135,6 @@ class Peer:
             except Exception as e:
                 error_logger.error(f"{self.host}:{self.port} Failed to send message: {e}")
                 continue
-
 
 if __name__ == "__main__":
     import time
