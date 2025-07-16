@@ -10,7 +10,7 @@ TODO
 
 Data transfer stands as the most important aspect of the current world. The ability to share and receive new ideas and philosophies shaped the world that we currently live in. From a technological standpoint, communication is essentially the movement of packets over networks with the help of certain protocols.
 
-This project is a secure peer-to-peer communication system over a custom network with simulated attacks. Inspired by military-grade communication architecture, it uses AES encryption and session key exchange. Common cryptographic attack vectors and defense mechanisms for this project have been demonstrated at https://github.com/woterr/p2p-MITM 
+This project is a secure peer-to-peer communication system over a custom network with simulated attacks. Inspired by military-grade communication architecture, it uses AES encryption and session key exchange.
 
 ## Understanding Peer-to-Peer networks
 
