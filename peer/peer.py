@@ -129,7 +129,7 @@ class Peer:
                 
                 print(f"\n[ RECEIVED from {sender[0]}:{sender_port} ]: {data}")
                 comms_logger.info(f'{self.host}:{self.port} received: {encrytped_data.hex()} from {sender[0]}:{sender_port}') 
-                print("[ MESSAGE (YOU) ]: ", end='', flush=True)
+                print("[ YOU ]: ", end='', flush=True)
  
             # incase connection dies out
             except ConnectionResetError:
