@@ -1,10 +1,8 @@
-TODO
+### TODO:
+- Document how to run this locally
 
-- Attacker:
-  MITM, Spoofing
-- Demo:
-  Spoof, ECB Attacks, Padding Oracle attack
-- Better UI
+# DEMONSTRATION:
+![Screen Recording 2025-07-23 013437](https://github.com/user-attachments/assets/d1e1b078-6c59-4a7f-afc5-b378bf54e4a9)
 
 # Infrastructure
 
