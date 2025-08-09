@@ -1,7 +1,17 @@
-### TODO:
-- Document how to run this locally
+# Run this locally
+- Clone the repository
+- Create a virtual environment
+- Install the required libraries:
+  `pip install -r requirements.txt`
+- `touch CREDENTIALS.txt`
+- `echo "<ipv4 address> <port>" > CREDENTIALS.txt`
+- `python3 main.py`
 
-# DEMONSTRATION:
+> [!NOTE]
+> The credentials in CREDENTIALS.txt contian the credentials of the system the program is running on. For communication, credentials of the receiver are to be entered once the program is running.
+
+
+# Demonstration
 ![Screen Recording 2025-07-23 013437](https://github.com/user-attachments/assets/d1e1b078-6c59-4a7f-afc5-b378bf54e4a9)
 
 # Infrastructure
@@ -61,3 +71,4 @@ This structure solves a good number of problems - as listed below:
 - **Scalability for Multi-Peer Networks**
 	- Q: Scalability for Multi-Peer Networks
 	- A: Each peer has its own session key per connection.
+
